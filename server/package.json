@@ -1,0 +1,40 @@
+{
+  "name": "BACKEND-template",
+  "version": "0.0.2-beta.528",
+  "description": "NODE REST server",
+  "main": "server.js",
+  "bin": "bin/cli",
+  "scripts": {
+    "build": "ng build --base-href /front/",
+    "maybe": "the line above only applies to the client?"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://gitlab.pvs.global"
+  },
+  "keywords": [],
+  "nodemonConfig": {
+    "ignore": [
+      "test/*",
+      "docs/*"
+    ],
+    "delay": "2500"
+  },
+  "author": "essadji",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "async": "^2.6.1",
+    "cors": "^2.8.5",
+    "express": "^4.16.4",
+    "follow-redirects": "^1.5.9",
+    "home": "^1.0.1",
+    "mysql": "^2.16.0",
+    "request": "^2.88.0",
+    "underscore": "^1.9.1",
+    "util": "^0.11.0",
+    "ws": "^6.1.2"
+  },
+  "devDependencies": {
+    "versiony": "^2.0.1"
+  }
+}
