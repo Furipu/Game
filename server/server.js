@@ -13,9 +13,37 @@ app.get("/getPlayers", cors(), function(req, res) {
   });
 });
 
+
 app.get("/setPlayer/:name", cors(), function(req, res) {
-  world.addPlayer(req.params.name);
-  res.send({ antwoord: `${req.params.name} added to world` });
+  let player = world.addPlayer(req.params.name);
+  res.send({ antwoord: ` ${player.name} added to world at position x:${player.xPos}, y:${player.yPos}` });
+});
+
+app.get("/movePlayer/:xFrom/:yFrom/:xTo/:yTo", cors(), function (req, res) {
+  let message;
+  let result = world.movePlayer(
+    Number(req.params.xFrom), 
+    Number(req.params.yFrom),
+    Number(req.params.xTo),
+    Number(req.params.yTo)
+  );
+  switch (result) {
+    case 'success':
+      message = `Player moved from ${req.params.xFrom}|${req.params.yFrom} to ${req.params.xTo}|${req.params.yTo}`;
+      break;
+    case 'fight':
+      message = `You gotta fight for your right`;
+      break;
+    case 'no player':
+      message = `No player at this position`;
+      break;
+    default:
+      message = `Move failed`;
+  }
+  
+  res.send({
+    antwoord: message
+  });
 });
 
 app.listen(frontport, () => {
