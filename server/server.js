@@ -27,22 +27,22 @@ app.get("/movePlayer/:xFrom/:yFrom/:xTo/:yTo", cors(), function (req, res) {
     Number(req.params.xTo),
     Number(req.params.yTo)
   );
-  switch (result) {
-    case 'success':
-      message = `Player moved from ${req.params.xFrom}|${req.params.yFrom} to ${req.params.xTo}|${req.params.yTo}`;
-      break;
-    case 'fight':
-      message = `You gotta fight for your right`;
-      break;
-    case 'no player':
-      message = `No player at this position`;
-      break;
-    default:
-      message = `Move failed`;
-  }
+  // switch (result) {
+  //   case 'success':
+  //     message = `Player moved from ${req.params.xFrom}|${req.params.yFrom} to ${req.params.xTo}|${req.params.yTo}`;
+  //     break;
+  //   case 'fight':
+  //     message = result;
+  //     break;
+  //   case 'no player':
+  //     message = `No player at this position`;
+  //     break;
+  //   default:
+  //     message = `Move failed`;
+  // }
   
   res.send({
-    antwoord: message
+    antwoord: result
   });
 });
 
