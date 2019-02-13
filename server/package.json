@@ -1,6 +1,6 @@
 {
   "name": "BACKEND-template",
-  "version": "0.0.2-beta.528",
+  "version": "0.0.2-beta.769",
   "description": "NODE REST server",
   "main": "server.js",
   "bin": "bin/cli",
