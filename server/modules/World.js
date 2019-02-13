@@ -4,6 +4,8 @@ const Player = require("./Player.js");
 module.exports = class World {
   constructor() {
     this.allPlayersMap = new Map();
+    this.allFightsMap = new Map();
+    this.lockedPositionsMap = new Map();
   }
 
   getAllPlayers() {
@@ -20,7 +22,14 @@ module.exports = class World {
     //in de spelersklasse om gemakkelijk op te kunnen zoeken
     const player = new Player(name,playerPosition.xPos,playerPosition.yPos); 
     this.allPlayersMap.set(this.makeKey(playerPosition.xPos,playerPosition.yPos), player);
-    return player;
+    return returnAll();
+  }
+
+  returnAll(){
+    return {
+      'players': this.allPlayersMap,
+      'fights': this.allFightsMap
+    };
   }
   
   initPosition() {
@@ -69,23 +78,95 @@ module.exports = class World {
     let posFrom = this.makeKey(xFrom, yFrom);
     let posTo = this.makeKey(xTo, yTo);
 
-    if (!this.allPlayersMap.has(posFrom)) {
-      //Player bestaat niet
-      return 'no player';
+    if(!this.checkPositionLocked(xTo,yTo)){
+      
+      this.lockPosition(xTo,yTo);
+  
+      if (!this.allPlayersMap.has(posFrom)) {
+        //Player bestaat niet
+        this.unlockPosition(xTo, yTo);
+        return 'no player';
+      }
+  
+      if (this.allPlayersMap.has(posTo)) {
+        //vechten
+        let fightId = posFrom + '|' + posTo;
+        let fight = {
+          'id':fightId,
+          'timestamp':Date.now(), // timestamp om timeout te bepalen als spelers niet tijdig een wapen kiezen - speler die niet tijdig reageert = dood
+          'playerFrom': this.allPlayersMap.get(posFrom),
+          'playerTo': this.allPlayersMap.get(posTo)
+        };
+        return this.allFightsMap.set(fightId, fight);
+
+
+      } else {
+        let player = this.allPlayersMap.get(posFrom);
+        player.xPos = xTo;
+        player.yPos = yTo;
+        this.allPlayersMap.set(posTo, player);
+        this.allPlayersMap.delete(posFrom);
+  
+        this.unlockPosition(xTo,yTo);
+
+        return returnAll();
+
+      }
+    }else{
+      return {
+        'locked': {
+          'from':posFrom,
+          'to': posTo
+        }
+      };
     }
 
-    if (this.allPlayersMap.has(posTo)) {
-      //vechten
-      return 'fight';
-    } else {
-      let player = this.allPlayersMap.get(posFrom);
-      player.xPos = xTo;
-      player.yPos = yTo;
-      this.allPlayersMap.set(posTo, player);
-      this.allPlayersMap.delete(posFrom);
 
-      return 'success';
+  }
+
+  timeOutFights(){
+    //initieren in constructor
+    //iteratieve check of fight langer dan 10 seconden bezig is
+    //indien timeout -> speler die niet gereageerd heeft, dus zonder wapen, sterft (kan allebei zijn)
+    //sterven =  verwijderen uit array
+    //volledige allPlayersmap en fightMap teruggeven aan front
+    this.unlockPosition(xTo, yTo);
+
+  }
+
+  fight(fight){
+
+    let actualFight = this.allFightsMap.get(fight.id);
+    let actualPlayerId = fight.player.id;
+
+    switch (actualPlayerId) {
+      case actualFight.playerFrom.id:
+        actualFight.playerFrom.weapon = fight.player.weapon;
+        this.allFightsMap.set(fight.id,actualFight);
+        break;
+      case actualFight.playerTo.id:
+        actualFight.playerTo.weapon = fight.player.weapon;
+        this.allFightsMap.set(fight.id, actualFight);
+        break;
+      default:
+        //error genereren
+        break;
     }
+
+    if (actualFight.playerFrom.weapon || actualFight.playerTo.weapon){
+      return 'waitforopponent';
+    }
+
+    
+
+
+    //indien wel - > logica blad steen schaar + verliezer verwijderen uit array en winnaar op to positie
+    //volledige allPlayersmap en fightMap teruggeven aan front
+    
+    this.unlockPosition(xTo, yTo);
+
+
+
 
   }
 
@@ -134,6 +215,24 @@ module.exports = class World {
 
   getRndInteger(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+
+  lockPosition(xPos, yPos){
+    let pos = this.makeKey(xPos, yPos);
+    this.lockedPositionsMap.set(pos, true);
+  }
+
+  unlockPosition(xPos, yPos){
+    let pos = this.makeKey(xPos, yPos);
+    this.lockedPositionsMap.delete(pos);
+  }
+
+  checkPositionLocked(xPos, yPos){
+    let pos = this.makeKey(xPos, yPos);
+    if(this.lockedPositionsMap.has(pos)){
+      console.log(true);
+      return true;
+    }
   }
 
   //TO DO logica init position, functie als speler beweegt, functie als 2 spelers op zelfde vakje komen (rekening houden maximum 2 spelers, anders melding)
