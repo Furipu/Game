@@ -1,8 +1,9 @@
 {
   "ExpandedNodes": [
     "",
-    "\\server"
+    "\\server",
+    "\\server\\modules"
   ],
-  "SelectedNode": "\\server",
+  "SelectedNode": "\\server\\modules\\Player.js",
   "PreviewInSolutionExplorer": false
 }
