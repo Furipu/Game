@@ -153,7 +153,7 @@ module.exports = class World {
         break;
     }
 
-    if (actualFight.playerFrom.weapon || actualFight.playerTo.weapon){
+    if (!actualFight.playerFrom.weapon || !actualFight.playerTo.weapon){
       return 'waitforopponent';
     }
 
